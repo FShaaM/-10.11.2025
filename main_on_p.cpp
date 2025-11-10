@@ -1,4 +1,4 @@
-#include <iostream>
+k#include <iostream>
 
 struct IntArray
 {
@@ -15,9 +15,10 @@ struct IntArray
 	}
 
 	int add(int i);
-	int get(size_t id) const;
-	size_t size() const;
-	int last() const;
+	int get(size_t id) const noexcept;
+	/*int at(size_t id) const;*/
+	size_t size() const noexcept;
+	int last() const noexcept;
 
 	int* a;
 	size_t k;
@@ -62,10 +63,20 @@ int main()
 
 int IntArray::get(size_t id) const
 {
-	if (id >= k)
-	{
-		throw std::logic_error("ERROR: bad id");
-	}
-
 	return a[id];
+}
+
+//int IntArray::at(size_t id) const
+//{
+//
+//}
+
+size_t IntArray::size() const noexcept
+{
+	return k;
+}
+
+int IntArray::last() const noexcept
+{
+	return get(size() - 1);
 }
