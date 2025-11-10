@@ -2,8 +2,11 @@
 
 struct IntArray
 {
-	IntArray(int i)
+	IntArray(int i) :
+		k(1),
+		a(new int[1])
 	{
+		
 
 	}
 
