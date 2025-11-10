@@ -80,3 +80,17 @@ int IntArray::last() const noexcept
 {
 	return get(size() - 1);
 }
+
+int IntArray::add(int i)
+{
+	int* dint = new int[size() + 1];
+
+	for (size_t i = 0; i < size(); ++i)
+	{
+		dint[i] = get(i);
+	}
+
+	delete[] a;
+	a = dint;
+	++k;
+}
