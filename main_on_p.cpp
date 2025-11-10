@@ -9,13 +9,16 @@ struct IntArray
 
 	~IntArray()
 	{
-
+		delete[] a;
 	}
 
 	int add(int i);
 	int get(size_t id) const;
 	size_t size() const;
 	int last() const;
+
+	int* a;
+	size_t k;
 };
 
 int main()
@@ -53,4 +56,5 @@ int main()
 		return 1;
 	}
 }
+
 
