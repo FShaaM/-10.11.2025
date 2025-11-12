@@ -23,6 +23,16 @@ struct IntArray
 	{
 		rhs.a = nullptr;
 	}
+
+	IntArray& operator = (IntArray&& rhs)
+	{
+		delete[] a;
+		a = rhs.a;
+		k = rhs.getsize();
+
+		rhs.a = nullptr;
+		return *this;
+	}
 	
 	int add(int i);
 	int get(size_t id) const noexcept;
