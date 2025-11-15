@@ -36,44 +36,78 @@ struct IntMatrix
 
 int main(int argc, const char** argv)
 {
-    IntMatrix mat;
-    std::ifstream InPut(argv[1]);
-
-    InPut.close();
-
-    size_t FirComm = 0, SecComm = 0;
-
-    int command;
-    while (std::cin >> command && !std::cin.eof())
+    try
     {
-        std::cin >> FirComm >> SecComm;
+        IntMatrix mat;
 
-        if (command == 1)
+        if (argc < 2)
         {
-            mat.Add_Fill_Rows(FirComm, SecComm);
+            std::cerr << "ERROR: need an argument" << "\n";
+            return 1;
         }
-        else if (command == 2)
+
+        std::ifstream InPut(argv[1]);
+
+        if (!(InPut.is_open()))
         {
-            mat.Add_Fill_Cols(FirComm, SecComm);
+            std::cerr << "ERROR: " << argv[1] << " file wasn't opened" << "\n";
+            return 1;
         }
-        else if (command == 3)
+
+        if (!mat.Fill(InPut))
         {
-            mat.Add_Fill_Rows(FirComm, 0);
-            mat.Add_Fill_Cols(SecComm, 0);
+            std::cerr << "ERROR: " << argv[1] << " contains bad elements" << "\n";
+            return 1;
         }
-        else
+
+        InPut.close();
+
+        size_t FirComm = 0, SecComm = 0;
+
+        int command;
+        while (std::cin >> command && !std::cin.eof())
         {
-            std::cerr << "EROOR: there is no such command" << "\n";
+            if (!(std::cin >> FirComm >> SecComm))
+            {
+                std::cerr << "ERROR: the command parameters must be numbers" << "\n";
+                return 3;
+            }
+
+            if (command == 1)
+            {
+                if (mat.Add_Fill_Rows(FirComm, SecComm) == 1)
+                    return 3;
+            }
+            else if (command == 2)
+            {
+                if (mat.Add_Fill_Cols(FirComm, SecComm) == 1)
+                    return 3;
+            }
+            else if (command == 3)
+            {
+                if (mat.Add_Fill_Rows(FirComm, 0) == 1)
+                    return 3;
+                if (mat.Add_Fill_Cols(SecComm, 0) == 1)
+                    return 3;
+            }
+            else
+            {
+                std::cerr << "EROOR: there is no such command" << "\n";
+                return 3;
+            }
+
+            mat.Set();
+        }
+
+        if (!std::cin && !std::cin.eof())
+        {
+            std::cerr << "ERROR: the command must be a number" << "\n";
             return 3;
         }
-
-    mat.Set();
     }
-
-    if (!std::cin && !std::cin.eof())
+    catch (const std::bad_alloc&)
     {
-        std::cerr << "ERROR: the command must be a number" << "\n";
-        return 3;
+        return 2;
     }
 }
 
@@ -159,4 +193,3 @@ IntArray& IntArray:: operator = (const IntArray& rhs)
 
     return *this;
 }
-
