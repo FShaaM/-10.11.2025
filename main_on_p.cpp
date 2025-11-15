@@ -295,3 +295,33 @@ int IntMatrix::Add_Fill_Rows(size_t num, int x)
 
     return 0;
 }
+
+int IntMatrix::Add_Fill_Cols(size_t num, int x)
+{
+    if (num > cols)
+    {
+        std::cerr << "ERROR: there are only " << cols << " columns in the matrix" << "\n";
+        return 1;
+    }
+
+    int* p = new int[rows * (cols + 1)] {};
+
+    for (size_t k = 0; k < rows; ++k)
+    {
+         for (size_t m = 0; m < num; ++m)
+              p[m + k * (cols + 1)] = arr.data[m + cols * k];
+
+         p[num + k * (cols + 1)] = x;
+
+         for (size_t m = num; m < cols; ++m)
+             p[m + 1 + k * (cols + 1)] = arr.data[m + k * cols];
+     }
+
+     delete[] arr.data;
+     arr.data = p;
+     p = nullptr;
+     ++cols;
+     arr.size = rows * cols;
+
+     return 0;
+}
