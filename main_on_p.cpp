@@ -1,138 +1,162 @@
 #include <iostream>
+#include <fstream>
+#include <exception>
 
 struct IntArray
 {
-	IntArray(int i) :
-		k(1),
-		a(new int[1])
-	{
-		*a = i;
-	}
+    int* data;
+    size_t size;
 
-	~IntArray()
-	{
-		delete[] a;
-	}
+    IntArray(int i);
+    ~IntArray();
+    IntArray(const IntArray& rhs);
+    IntArray& operator = (const IntArray& rhs);
+    IntArray(IntArray&& rhs);
+    IntArray& operator = (IntArray&& rhs);
 
-	IntArray(const IntArray& rhs);
-	IntArray& operator = (const IntArray& rhs);
-
-	IntArray(IntArray&& rhs):
-		a(rhs.a),
-		k(rhs.getsize())
-	{
-		rhs.a = nullptr;
-	}
-
-	IntArray& operator = (IntArray&& rhs)
-	{
-		delete[] a;
-		a = rhs.a;
-		k = rhs.getsize();
-
-		rhs.a = nullptr;
-		return *this;
-	}
-	
-	int add(int i);
-	int get(size_t id) const noexcept;
-	/*int at(size_t id) const;*/
-	size_t getsize() const noexcept;
-	int last() const noexcept;
-
-	int* a;
-	size_t k;
+    void add(int i);
+    int get(size_t id) const noexcept;
+    size_t getsize() const noexcept;
+    int last() const noexcept;
 };
 
-int main()
+struct IntMatrix
 {
-	try
-	{
-		int next = 0;
-		std::cin >> next;
+    IntArray arr = IntArray(0);
+    size_t rows = 0;
+    size_t cols = 0;
 
-		IntArray a(next);
+    std::istream& Fill(std::istream& In);
+    void Set() const noexcept;
+    int Add_Fill_Rows(size_t num, int x);
+    int Add_Fill_Cols(size_t num, int x);
+};
 
-		while (std::cin >> next)
-		{
-			a.add(next);
-		}
 
-		if (!std::cin && !std::cin.eof())
-		{
-			return 1;
-		}
 
-		size_t count = 1;
+int main(int argc, const char** argv)
+{
+    IntMatrix mat;
+    std::ifstream InPut(argv[1]);
 
-		for (size_t i = 0; i < a.getsize() - 1; ++i)
-		{
-			int d = a.get(i);
+    InPut.close();
 
-			count += !(d % a.last()) ? 1 : 0;
-		}
+    size_t FirComm = 0, SecComm = 0;
 
-		std::cout << count << "\n";
-	}
-	catch (...)
-	{
-		return 1;
-	}
+    int command;
+    while (std::cin >> command && !std::cin.eof())
+    {
+        std::cin >> FirComm >> SecComm;
+
+        if (command == 1)
+        {
+            mat.Add_Fill_Rows(FirComm, SecComm);
+        }
+        else if (command == 2)
+        {
+            mat.Add_Fill_Cols(FirComm, SecComm);
+        }
+        else if (command == 3)
+        {
+            mat.Add_Fill_Rows(FirComm, 0);
+            mat.Add_Fill_Cols(SecComm, 0);
+        }
+        else
+        {
+            std::cerr << "EROOR: there is no such command" << "\n";
+            return 3;
+        }
+
+    mat.Set();
+    }
+
+    if (!std::cin && !std::cin.eof())
+    {
+        std::cerr << "ERROR: the command must be a number" << "\n";
+        return 3;
+    }
+}
+
+IntArray::IntArray(int i) :
+    size(1),
+    data(new int[1])
+{
+    *data = i;
+}
+
+IntArray::~IntArray()
+{
+    delete[] data;
+}
+
+IntArray::IntArray(IntArray&& rhs) :
+    data(rhs.data),
+    size(rhs.size)
+{
+    rhs.data = nullptr;
+}
+
+IntArray& IntArray::operator = (IntArray&& rhs)
+{
+    delete[] data;
+    data = rhs.data;
+    size = rhs.getsize();
+
+    rhs.data = nullptr;
+    return *this;
 }
 
 IntArray::IntArray(const IntArray& rhs) :
-	a(new int[rhs.getsize()]),
-	k(getsize())
+    data(new int[rhs.getsize()]),
+    size(rhs.getsize())
 {
-	for (size_t i = 0; i < rhs.getsize(); ++i)
-		a[i] = rhs.get(i);
+    for (size_t i = 0; i < rhs.getsize(); ++i)
+        data[i] = rhs.get(i);
 }
 
-int IntArray::get(size_t id) const
+int IntArray::get(size_t id) const noexcept
 {
-	return a[id];
+    return data[id];
 }
-
-//int IntArray::at(size_t id) const
-//{
-//
-//}
 
 size_t IntArray::getsize() const noexcept
 {
-	return k;
+    return size;
 }
 
 int IntArray::last() const noexcept
 {
-	return get(getsize() - 1);
+    return get(getsize() - 1);
 }
 
-int IntArray::add(int i)
+void IntArray::add(int i)
 {
-	int* dint = new int[getsize() + 1];
+    int* dint = new int[getsize() + 1];
 
-	for (size_t i = 0; i < getsize(); ++i)
-	{
-		dint[i] = get(i);
-	}
+    for (size_t k = 0; k < getsize(); ++k)
+    {
+        dint[k] = get(k);
+    }
 
-	delete[] a;
-	a = dint;
-	++k;
+    dint[getsize()] = i;
+
+    delete[] data;
+    data = dint;
+    ++size;
 }
 
-IntArray& IntArray:: operator = (const IntArray & rhs)
+IntArray& IntArray:: operator = (const IntArray& rhs)
 {
-	k = rhs.getsize();
-	int* p = new int[rhs.getsize()];
+    size = rhs.getsize();
+    int* p = new int[rhs.getsize()];
 
-	for (size_t i = 0; i < rhs.getsize(); ++i)
-		p[i] = rhs.get(i);
+    for (size_t i = 0; i < rhs.getsize(); ++i)
+        p[i] = rhs.get(i);
 
-	delete[] a;
-	a = p;
-	k = rhs.getsize();
+    delete[] data;
+    data = p;
+    size = rhs.getsize();
 
-	return *this;
+    return *this;
 }
+
