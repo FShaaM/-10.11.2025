@@ -261,3 +261,37 @@ void IntMatrix::Set() const noexcept
 
         std::cout << "\n";
 }
+
+int IntMatrix::Add_Fill_Rows(size_t num, int x)
+{
+    if (num > rows)
+    {
+        std::cerr << "ERROR: there are only " << rows << " rows in the matrix" << "\n";
+        return 1;
+    }
+
+    int* p = new int[cols * (rows + 1)] {};
+
+    for (size_t k = 0; k < num; ++k)
+    {
+        for (size_t m = 0; m < cols; ++m)
+            p[m + k * cols] = arr.data[m + k * cols];
+    }
+
+    for (size_t m = 0; m < cols; ++m)
+        p[m + num * cols] = x;
+
+    for (size_t k = num + 1; k < rows + 1; ++k)
+    {
+        for (size_t m = 0; m < cols; ++m)
+            p[m + k * cols] = arr.data[m + (k - 1) * cols];
+    }
+
+    delete[] arr.data;
+    arr.data = p;
+    p = nullptr;
+    ++rows;
+    arr.size = rows * cols;
+
+    return 0;
+}
