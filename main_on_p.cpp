@@ -193,3 +193,71 @@ IntArray& IntArray:: operator = (const IntArray& rhs)
 
     return *this;
 }
+
+std::istream& IntMatrix::Fill(std::istream& In)
+{
+    if (!(In >> rows >> cols))
+    {
+        std::cerr << "ERROR: Bad rows/cols" << "\n";
+
+        rows = 0;
+        cols = 0;
+
+        return In;
+    }
+    else if (rows == 0 || cols == 0)
+    {
+        std::cerr << "ERROR: Zero matrix dimensions" << "\n";
+        return In;
+    }
+
+    try
+    {
+        delete[] arr.data;
+        arr.data = new int[rows * cols];
+        arr.size = rows * cols;
+    }
+    catch (const std::bad_alloc&)
+    {
+        std::cerr << "ERROR: memory allocation error" << "\n";
+
+        arr.data = nullptr;
+        arr.size = 0;
+        rows = 0;
+        cols = 0;
+
+        throw;
+    }
+
+    size_t counter = 0;
+
+    for (; counter < arr.size && In >> arr.data[counter]; ++counter);
+
+    if (counter != arr.size)
+    {
+        std::cerr << "ERROR: matrix reading error, " << counter << " elements were read" << "\n";
+
+        delete[] arr.data;
+        arr.data = nullptr;
+        arr.size = 0;
+        rows = 0;
+        cols = 0;
+    }
+
+    return In;
+}
+
+void IntMatrix::Set() const noexcept
+{
+    std::cout << "\n";
+
+    for (size_t i = 0; i < rows; ++i)
+    {
+        std::cout << arr.data[i * cols];
+        for (size_t j = 1; j < cols; ++j)
+            std::cout << " " << arr.data[i * cols + j];
+        std::cout << "\n";
+    }
+
+        std::cout << "\n";
+}
