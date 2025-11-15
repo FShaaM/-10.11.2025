@@ -258,7 +258,7 @@ void IntMatrix::Set() const noexcept
             std::cout << " " << arr.data[i * cols + j];
         std::cout << "\n";
     }
-
+    
         std::cout << "\n";
 }
 
@@ -270,31 +270,47 @@ int IntMatrix::Add_Fill_Rows(size_t num, int x)
         return 1;
     }
 
-    int* p = new int[cols * (rows + 1)] {};
-
-    for (size_t k = 0; k < num; ++k)
+    try
     {
+        int* p = new int[cols * (rows + 1)] {};
+
+        for (size_t k = 0; k < num; ++k)
+        {
+            for (size_t m = 0; m < cols; ++m)
+                p[m + k * cols] = arr.data[m + k * cols];
+        }
+
         for (size_t m = 0; m < cols; ++m)
-            p[m + k * cols] = arr.data[m + k * cols];
+            p[m + num * cols] = x;
+
+        for (size_t k = num + 1; k < rows + 1; ++k)
+        {
+            for (size_t m = 0; m < cols; ++m)
+                p[m + k * cols] = arr.data[m + (k - 1) * cols];
+        }
+
+        delete[] arr.data;
+        arr.data = p;
+        p = nullptr;
+        ++rows;
+        arr.size = rows * cols;
+
+        return 0;
     }
-
-    for (size_t m = 0; m < cols; ++m)
-        p[m + num * cols] = x;
-
-    for (size_t k = num + 1; k < rows + 1; ++k)
+    catch (const std::bad_alloc&)
     {
-        for (size_t m = 0; m < cols; ++m)
-            p[m + k * cols] = arr.data[m + (k - 1) * cols];
+        std::cerr << "ERROR: memory allocation error" << "\n";
+
+        delete[] arr.data;
+        arr.data = nullptr;
+        arr.size = 0;
+        rows = 0;
+        cols = 0;
+
+        throw;
     }
-
-    delete[] arr.data;
-    arr.data = p;
-    p = nullptr;
-    ++rows;
-    arr.size = rows * cols;
-
-    return 0;
 }
+
 
 int IntMatrix::Add_Fill_Cols(size_t num, int x)
 {
@@ -304,24 +320,39 @@ int IntMatrix::Add_Fill_Cols(size_t num, int x)
         return 1;
     }
 
-    int* p = new int[rows * (cols + 1)] {};
-
-    for (size_t k = 0; k < rows; ++k)
+    try
     {
-         for (size_t m = 0; m < num; ++m)
-              p[m + k * (cols + 1)] = arr.data[m + cols * k];
+        int* p = new int[rows * (cols + 1)] {};
 
-         p[num + k * (cols + 1)] = x;
+        for (size_t k = 0; k < rows; ++k)
+        {
+            for (size_t m = 0; m < num; ++m)
+                p[m + k * (cols + 1)] = arr.data[m + cols * k];
 
-         for (size_t m = num; m < cols; ++m)
-             p[m + 1 + k * (cols + 1)] = arr.data[m + k * cols];
-     }
+            p[num + k * (cols + 1)] = x;
 
-     delete[] arr.data;
-     arr.data = p;
-     p = nullptr;
-     ++cols;
-     arr.size = rows * cols;
+            for (size_t m = num; m < cols; ++m)
+                p[m + 1 + k * (cols + 1)] = arr.data[m + k * cols];
+        }
 
-     return 0;
+        delete[] arr.data;
+        arr.data = p;
+        p = nullptr;
+        ++cols;
+        arr.size = rows * cols;
+
+        return 0;
+    }
+    catch (const std::bad_alloc&)
+    {
+        std::cerr << "ERROR: memory allocation error" << "\n";
+
+        delete[] arr.data;
+        arr.data = nullptr;
+        arr.size = 0;
+        rows = 0;
+        cols = 0;
+
+        throw;
+    }
 }
